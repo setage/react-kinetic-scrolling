@@ -1,0 +1,26 @@
+.Scrolling {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.Scrolling_horizontal {
+    width: 100%;
+    height: 120px;
+}
+
+.Scrolling_vertical {
+    width: 200px;
+    height: 100%;
+}
+
+.Scrolling__view {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.Scrolling_horizontal .Scrolling__view {
+    white-space: nowrap;
+}

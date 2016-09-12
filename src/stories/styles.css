@@ -1,0 +1,14 @@
+.item {
+    width: 200px;
+    height: 120px;
+    background: #33a;
+    color: #fff;
+    font: bold 22px/120px sans-serif;
+    display: inline-block;
+    margin: 10px 5px;
+    text-align: center;
+}
+
+.item_horizontal {
+    margin: 5px 10px;
+}
