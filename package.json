@@ -4,7 +4,7 @@
   "description": "React Kinetic Scrolling Component",
   "repository": {
     "type": "git",
-    "url": "https://github.com/you/repo.git"
+    "url": "https://github.com/setage/react-kinetic-scrolling.git"
   },
   "license": "MIT",
   "scripts": {
