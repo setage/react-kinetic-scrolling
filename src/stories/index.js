@@ -5,7 +5,7 @@ import './styles.css'
 
 storiesOf('Button', module)
     .add('default view', () => (
-        <Scrolling horizontal>
+        <Scrolling horizontal snap>
             <div className="item">1</div>
             <div className="item">2</div>
             <div className="item">3</div>

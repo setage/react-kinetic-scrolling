@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import './styles.css'
 
 const TIME_CONSTANT = 325
+const SNAP = 210
 
 class Scrolling extends React.Component {
     componentWillMount() {
@@ -13,7 +14,6 @@ class Scrolling extends React.Component {
             offset: 0,
             min: 0,
             max: 0,
-            timestamp: Date.now(),
         })
     }
 
@@ -22,17 +22,12 @@ class Scrolling extends React.Component {
     }
 
     setMaxTransform() {
-        if (this.props.horizontal) {
-            this.setState({
-                max: this.refs.view.getBoundingClientRect().width -
-                     this.refs.base.getBoundingClientRect().width,
-            })
-        } else {
-            this.setState({
-                max: this.refs.view.getBoundingClientRect().height -
-                     this.refs.base.getBoundingClientRect().height,
-            })
-        }
+        const measurement = this.props.horizontal ? 'width' : 'height'
+
+        this.setState({
+            max: this.refs.view.getBoundingClientRect()[measurement] -
+                 this.refs.base.getBoundingClientRect()[measurement],
+        })
     }
 
     xpos(e) {
@@ -92,7 +87,8 @@ class Scrolling extends React.Component {
         if (this.state.amplitude) {
             elapsed = Date.now() - this.state.timestamp
             delta = -this.state.amplitude * Math.exp(-elapsed / TIME_CONSTANT)
-            if (delta > 0.5 || delta < -0.5) {
+
+            if (delta > 5 || delta < -5) {
                 this.scroll(this.state.target + delta)
                 const boundAutoscroll = this.autoScroll.bind(this)
                 requestAnimationFrame(boundAutoscroll)
@@ -103,9 +99,6 @@ class Scrolling extends React.Component {
     }
 
     tap(e) {
-        if (this.ticker) {
-            clearInterval(this.ticker)
-        }
         this.setState({
             pressed: true,
             reference: this.props.horizontal ? this.xpos(e) : this.ypos(e),
@@ -115,8 +108,8 @@ class Scrolling extends React.Component {
             frame: this.state.offset,
         })
 
+        clearInterval(this.ticker)
         const boundTrack = this.track.bind(this)
-
         this.ticker = setInterval(boundTrack, 100)
 
         e.preventDefault()
@@ -131,6 +124,7 @@ class Scrolling extends React.Component {
         if (this.state.pressed) {
             x = this.props.horizontal ? this.xpos(e) : this.ypos(e)
             delta = this.state.reference - x
+
             if (delta > 2 || delta < -2) {
                 this.setState({
                     reference: x,
@@ -151,11 +145,15 @@ class Scrolling extends React.Component {
 
         clearInterval(this.ticker)
         if (this.state.velocity > 10 || this.state.velocity < -10) {
+            const amplitude = 0.8 * this.state.velocity
+            const target = Math.round(this.state.offset + amplitude)
+
             this.setState({
-                amplitude: 0.8 * this.state.velocity,
-                target: Math.round(this.state.offset + this.state.amplitude),
+                target,
+                amplitude,
                 timestamp: Date.now(),
             })
+
             const boundAutoscroll = this.autoScroll.bind(this)
             requestAnimationFrame(boundAutoscroll)
         }
@@ -165,10 +163,43 @@ class Scrolling extends React.Component {
         return false
     }
 
+    releaseSnap(e) {
+        this.setState({
+            pressed: false,
+        })
+
+        clearInterval(this.ticker)
+        let amplitude
+        let target = this.state.offset
+
+        if (this.state.velocity > 10 || this.state.velocity < -10) {
+            amplitude = 0.8 * this.state.velocity
+            target = Math.round(this.state.offset + amplitude)
+        }
+
+        target = Math.round(target / SNAP) * SNAP
+        amplitude = target - this.state.offset
+
+        this.setState({
+            target,
+            amplitude,
+            timestamp: Date.now(),
+        })
+
+        const boundAutoscroll = this.autoScroll.bind(this)
+        requestAnimationFrame(boundAutoscroll)
+
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+    }
+
     render() {
         const tapHandler = this.tap.bind(this)
         const moveHandler = this.drag.bind(this)
-        const releaseHandler = this.release.bind(this)
+        const releaseHandler = this.props.snap ?
+                               this.releaseSnap.bind(this) :
+                               this.release.bind(this)
 
         const className = classNames('Scrolling', {
             Scrolling_vertical: !this.props.horizontal,
@@ -181,9 +212,6 @@ class Scrolling extends React.Component {
                 <div
                   className="Scrolling__view"
                   ref="view"
-                  onTouchStart={tapHandler}
-                  onTouchMove={moveHandler}
-                  onTouchEnd={releaseHandler}
                   onMouseDown={tapHandler}
                   onMouseMove={moveHandler}
                   onMouseUp={releaseHandler}
@@ -198,6 +226,7 @@ class Scrolling extends React.Component {
 Scrolling.propTypes = {
     children: React.PropTypes.array.isRequired,
     horizontal: React.PropTypes.bool,
+    snap: React.PropTypes.bool,
 }
 
 export default Scrolling
