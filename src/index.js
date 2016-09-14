@@ -40,6 +40,10 @@ class Scrolling extends React.Component {
         return e[clientPos]
     }
 
+    scrollToItem(idx) {
+        this.scroll(idx * this.props.snap)
+    }
+
     scroll(x) {
         const { min, max } = this.state
 
@@ -215,7 +219,10 @@ class Scrolling extends React.Component {
 }
 
 Scrolling.propTypes = {
-    children: React.PropTypes.array.isRequired,
+    children: React.PropTypes.oneOfType([
+        React.PropTypes.array,
+        React.PropTypes.string,
+    ]).isRequired,
     className: React.PropTypes.string,
     horizontal: React.PropTypes.bool,
     snap: React.PropTypes.number,

@@ -3,7 +3,7 @@ import { storiesOf } from '@kadira/storybook'
 import Scrolling from '../index'
 import './styles.css'
 
-storiesOf('Button', module)
+storiesOf('Scrolling', module)
     .add('default view', () => (
         <Scrolling horizontal snap={210}>
             <div className="item">1</div>
@@ -20,15 +20,15 @@ storiesOf('Button', module)
     ))
     .add('vertical view', () => (
         <Scrolling>
-            <div className="item item_horizontal">1</div>
-            <div className="item item_horizontal">2</div>
-            <div className="item item_horizontal">3</div>
-            <div className="item item_horizontal">4</div>
-            <div className="item item_horizontal">5</div>
-            <div className="item item_horizontal">6</div>
-            <div className="item item_horizontal">7</div>
-            <div className="item item_horizontal">8</div>
-            <div className="item item_horizontal">9</div>
-            <div className="item item_horizontal">10</div>
+            <div className="item item_vertical">1</div>
+            <div className="item item_vertical">2</div>
+            <div className="item item_vertical">3</div>
+            <div className="item item_vertical">4</div>
+            <div className="item item_vertical">5</div>
+            <div className="item item_vertical">6</div>
+            <div className="item item_vertical">7</div>
+            <div className="item item_vertical">8</div>
+            <div className="item item_vertical">9</div>
+            <div className="item item_vertical">10</div>
         </Scrolling>
     ))
