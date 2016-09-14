@@ -1,6 +1,6 @@
 {
   "name": "react-kinetic-scrolling",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React Kinetic Scrolling Component",
   "repository": {
     "type": "git",
@@ -29,7 +29,6 @@
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-2": "^6.5.0",
     "chai": "^3.5.0",
-    "classnames": "^2.2.5",
     "enzyme": "^2.2.0",
     "eslint": "^2.7.0",
     "eslint-config-airbnb": "^7.0.0",
@@ -52,6 +51,9 @@
     "babel-runtime": "^6.5.0"
   },
   "main": "dist/index.js",
+  "directories": {
+    "assets": "src/assets"
+  },
   "engines": {
     "npm": "^3.0.0"
   }
