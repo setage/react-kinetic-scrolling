@@ -4,7 +4,6 @@ import classNames from 'classnames'
 import './styles.css'
 
 const TIME_CONSTANT = 325
-const SNAP = 210
 
 class Scrolling extends React.Component {
     componentWillMount() {
@@ -30,24 +29,15 @@ class Scrolling extends React.Component {
         })
     }
 
-    xpos(e) {
+    pos(e) {
         // touch event
+        const clientPos = this.props.horizontal ? 'clientX' : 'clientY'
         if (e.targetTouches && (e.targetTouches.length >= 1)) {
-            return e.targetTouches[0].clientX
+            return e.targetTouches[0][clientPos]
         }
 
         // mouse event
-        return e.clientX
-    }
-
-    ypos(e) {
-        // touch event
-        if (e.targetTouches && (e.targetTouches.length >= 1)) {
-            return e.targetTouches[0].clientY
-        }
-
-        // mouse event
-        return e.clientY
+        return e[clientPos]
     }
 
     scroll(x) {
@@ -101,7 +91,7 @@ class Scrolling extends React.Component {
     tap(e) {
         this.setState({
             pressed: true,
-            reference: this.props.horizontal ? this.xpos(e) : this.ypos(e),
+            reference: this.pos(e),
             velocity: 0,
             amplitude: 0,
             timestamp: Date.now(),
@@ -122,7 +112,7 @@ class Scrolling extends React.Component {
         let delta
 
         if (this.state.pressed) {
-            x = this.props.horizontal ? this.xpos(e) : this.ypos(e)
+            x = this.pos(e)
             delta = this.state.reference - x
 
             if (delta > 2 || delta < -2) {
@@ -177,7 +167,7 @@ class Scrolling extends React.Component {
             target = Math.round(this.state.offset + amplitude)
         }
 
-        target = Math.round(target / SNAP) * SNAP
+        target = Math.round(target / this.props.snap) * this.props.snap
         amplitude = target - this.state.offset
 
         this.setState({
@@ -204,6 +194,7 @@ class Scrolling extends React.Component {
         const className = classNames('Scrolling', {
             Scrolling_vertical: !this.props.horizontal,
             Scrolling_horizontal: this.props.horizontal,
+            [this.props.className]: this.props.className,
         })
 
         return (
@@ -225,8 +216,9 @@ class Scrolling extends React.Component {
 
 Scrolling.propTypes = {
     children: React.PropTypes.array.isRequired,
+    className: React.PropTypes.string,
     horizontal: React.PropTypes.bool,
-    snap: React.PropTypes.bool,
+    snap: React.PropTypes.number,
 }
 
 export default Scrolling
