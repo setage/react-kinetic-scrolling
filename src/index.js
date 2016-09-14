@@ -1,7 +1,4 @@
 import React from 'react'
-import classNames from 'classnames'
-
-import './styles.css'
 
 const TIME_CONSTANT = 325
 
@@ -195,17 +192,32 @@ class Scrolling extends React.Component {
                                this.releaseSnap.bind(this) :
                                this.release.bind(this)
 
-        const className = classNames('Scrolling', {
-            Scrolling_vertical: !this.props.horizontal,
-            Scrolling_horizontal: this.props.horizontal,
-            [this.props.className]: this.props.className,
-        })
+        const baseStyle = {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+        }
+
+        let viewStyle = {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+        }
+
+        if (this.props.horizontal) {
+            viewStyle = {
+                ...viewStyle,
+                whiteSpace: 'nowrap',
+            }
+        }
 
         return (
-            <div className={className} ref="base">
-                <div className="Scrolling__indicator" ref="indicator"></div>
+            <div style={baseStyle} className={this.props.className} ref="base">
                 <div
-                  className="Scrolling__view"
+                  style={viewStyle}
                   ref="view"
                   onMouseDown={tapHandler}
                   onMouseMove={moveHandler}
