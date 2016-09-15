@@ -35,10 +35,6 @@ class Scrolling extends React.Component {
         return e[clientPos]
     }
 
-    scrollToItem(idx) {
-        this.scroll((idx - 1) * this.props.snap)
-    }
-
     scroll(x) {
         const { min, max } = this.state
         let offset = (x > max) ? max : null
@@ -85,6 +81,25 @@ class Scrolling extends React.Component {
             }
         }
     }
+
+    // Public methods
+
+    scrollToItem(idx) {
+        if (this.props.snap) {
+            this.scroll((idx - 1) * this.props.snap)
+        }
+        return !!this.props.snap
+    }
+
+    atBegin() {
+        return this.state.offset === 0
+    }
+
+    atEnd() {
+        return this.state.offset === this.state.max
+    }
+
+    // Events handlers
 
     handleTap(e) {
         this.setState({
