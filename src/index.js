@@ -1,6 +1,7 @@
 import React from 'react'
 
 const TIME_CONSTANT = 325
+const WHEEL_SPEED = 50
 
 class Scrolling extends React.Component {
     componentWillMount() {
@@ -89,7 +90,7 @@ class Scrolling extends React.Component {
         }
     }
 
-    tap(e) {
+    handleTap(e) {
         this.setState({
             pressed: true,
             reference: this.pos(e),
@@ -108,7 +109,7 @@ class Scrolling extends React.Component {
         return false
     }
 
-    drag(e) {
+    handleDrag(e) {
         let x
         let delta
 
@@ -129,7 +130,7 @@ class Scrolling extends React.Component {
         return false
     }
 
-    release(e) {
+    handleRelease(e) {
         this.setState({
             pressed: false,
         })
@@ -154,7 +155,7 @@ class Scrolling extends React.Component {
         return false
     }
 
-    releaseSnap(e) {
+    handleReleaseWithSnap(e) {
         this.setState({
             pressed: false,
         })
@@ -185,12 +186,35 @@ class Scrolling extends React.Component {
         return false
     }
 
+    handleWheel(e) {
+        let target = this.state.offset + e.deltaY * WHEEL_SPEED
+
+        if (this.props.snap) {
+            target = Math.round(target / this.props.snap) * this.props.snap
+        }
+        const amplitude = target - this.state.offset
+
+        this.setState({
+            target,
+            amplitude,
+            timestamp: Date.now(),
+        })
+
+        const boundAutoscroll = this.autoScroll.bind(this)
+        requestAnimationFrame(boundAutoscroll)
+
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+    }
+
     render() {
-        const tapHandler = this.tap.bind(this)
-        const moveHandler = this.drag.bind(this)
+        const tapHandler = this.handleTap.bind(this)
+        const dragHandler = this.handleDrag.bind(this)
         const releaseHandler = this.props.snap ?
-                               this.releaseSnap.bind(this) :
-                               this.release.bind(this)
+                               this.handleReleaseWithSnap.bind(this) :
+                               this.handleRelease.bind(this)
+        const wheelHandler = this.handleWheel.bind(this)
 
         const baseStyle = {
             position: 'absolute',
@@ -220,8 +244,9 @@ class Scrolling extends React.Component {
                   style={viewStyle}
                   ref="view"
                   onMouseDown={tapHandler}
-                  onMouseMove={moveHandler}
+                  onMouseMove={dragHandler}
                   onMouseUp={releaseHandler}
+                  onWheel={wheelHandler}
                 >
                     {this.props.children}
                 </div>
