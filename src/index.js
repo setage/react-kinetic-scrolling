@@ -62,6 +62,7 @@ class Scrolling extends React.Component {
                                          `translateY(${-offset}px)`
 
         this.setState({ offset })
+        this.trackPosition()
     }
 
     track() {
@@ -279,6 +280,15 @@ class Scrolling extends React.Component {
         return false
     }
 
+    trackPosition() {
+        if (this.props.trackPosition) {
+            this.props.trackPosition({
+                atBegin: this.atBegin(),
+                atEnd: this.atEnd(),
+            })
+        }
+    }
+
     render() {
         const tapHandler = this.handleTap.bind(this)
         const dragHandler = this.handleDrag.bind(this)
@@ -320,6 +330,7 @@ Scrolling.propTypes = {
     className: React.PropTypes.string,
     horizontal: React.PropTypes.bool,
     snap: React.PropTypes.number,
+    trackPosition: React.PropTypes.func,
 }
 
 export default Scrolling
