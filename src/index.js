@@ -20,11 +20,8 @@ class Scrolling extends React.Component {
 
     setMaxTransform() {
         const measurement = this.props.horizontal ? 'width' : 'height'
-
-        this.setState({
-            max: this.refs.view.getBoundingClientRect()[measurement] -
-                 this.refs.base.getBoundingClientRect()[measurement],
-        })
+        this.state.max = this.refs.view.getBoundingClientRect()[measurement] -
+                         this.refs.base.getBoundingClientRect()[measurement]
     }
 
     pos(e) {
@@ -39,12 +36,11 @@ class Scrolling extends React.Component {
     }
 
     scrollToItem(idx) {
-        this.scroll(idx * this.props.snap)
+        this.scroll((idx - 1) * this.props.snap)
     }
 
     scroll(x) {
         const { min, max } = this.state
-
         let offset = (x > max) ? max : null
         if (!offset) {
             offset = (x < min) ? min : x
@@ -99,6 +95,7 @@ class Scrolling extends React.Component {
             timestamp: Date.now(),
             frame: this.state.offset,
         })
+        this.dragOccured = false // Resets flag
 
         clearInterval(this.ticker)
         const boundTrack = this.track.bind(this)
@@ -122,6 +119,7 @@ class Scrolling extends React.Component {
                     reference: x,
                 })
                 this.scroll(this.state.offset + delta)
+                this.dragOccured = true // Sets flag to detect from parent component if drag occured
             }
         }
 

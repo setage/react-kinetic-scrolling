@@ -1,7 +1,10 @@
 # React Kinetic Scrolling
 
-Set of React components that uses kinetic scrolling realization by https://github.com/ariya/kinetic/
+React component which handle scrolling be mouse drag, with kinetic effect (like in mobile interfaces).
 
-Now there is only one component, which have options for different behavior:
+It supports:
 - vertical and horizontal scrolling
 - snap to grid feature
+- mouse wheel scrolling
+
+Used https://github.com/ariya/kinetic/ for kinetic effect calculations.
