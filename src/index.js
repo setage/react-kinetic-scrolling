@@ -166,9 +166,6 @@ class Scrolling extends React.Component {
             timestamp: Date.now(),
             frame: this.state.offset,
         })
-        this.setState({
-            dragging: false,
-        }) // Resets flag
 
         clearInterval(this.ticker)
         const boundTrack = this.track.bind(this)
@@ -194,6 +191,7 @@ class Scrolling extends React.Component {
                     reference: x,
                     dragging: true,
                 })
+
                 this.scroll(this.state.offset + delta)
                 this.viewStyle = {
                     ...this.viewStyle,
@@ -299,6 +297,12 @@ class Scrolling extends React.Component {
         }
     }
 
+    handleClick() {
+        this.setState({
+            dragging: false,
+        })
+    }
+
     render() {
         const tapHandler = this.handleTap.bind(this)
         const dragHandler = this.handleDrag.bind(this)
@@ -306,6 +310,8 @@ class Scrolling extends React.Component {
                                this.handleReleaseWithSnap.bind(this) :
                                this.handleRelease.bind(this)
         const wheelHandler = this.handleWheel.bind(this)
+
+        const clickHandler = this.handleClick.bind(this)
 
         let viewStyle = this.viewStyle || VIEW_STYLE
         if (this.props.horizontal) {
@@ -323,6 +329,7 @@ class Scrolling extends React.Component {
                   onMouseDown={tapHandler}
                   onMouseMove={dragHandler}
                   onMouseUp={releaseHandler}
+                  onClick={clickHandler}
                   onWheel={wheelHandler}
                 >
                     {this.props.children}
