@@ -3,14 +3,17 @@ import React from 'react'
 const TIME_CONSTANT = 325
 
 class Scrolling extends React.Component {
-    componentWillMount() {
-        this.setState({
+    constructor(props) {
+        super(props)
+        this.state = {
             pressed: false,
             reference: null,
             offset: 0,
             min: 0,
             max: 0,
-        })
+        }
+        this.prev = this.prev.bind(this)
+        this.next = this.next.bind(this)
     }
 
     componentDidMount() {
