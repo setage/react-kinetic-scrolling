@@ -17,7 +17,7 @@ children | array, string | Accepts simple text or array of elements.
 snap | number | Determines width of grid cell and enables "snap to grid" feature.
 horizontal | bool | Vertical scrolling enabled by default. Set this property to make scrolling horizontally.
 className | string | Adding custom styling for root div of the component
-trackPosition | func | Callback for tracking when Scrolling at edge positions.
+trackPosition | func | Callback for tracking when Scrolling at edge positions and if it is dragging (need for disabling click handlers on items).
 
 ##Methods:
 
