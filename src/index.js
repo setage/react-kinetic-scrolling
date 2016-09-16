@@ -174,6 +174,8 @@ class Scrolling extends React.Component {
         const boundTrack = this.track.bind(this)
         this.ticker = setInterval(boundTrack, 100)
 
+        this.trackPosition()
+
         e.preventDefault()
         e.stopPropagation()
         return false
