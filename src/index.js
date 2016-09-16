@@ -31,6 +31,11 @@ class Scrolling extends React.Component {
         }
         this.prev = this.prev.bind(this)
         this.next = this.next.bind(this)
+
+        this.handleDrag = this.handleDrag.bind(this)
+        this.handleRelease = this.props.snap ?
+                             this.handleReleaseWithSnap.bind(this) :
+                             this.handleRelease.bind(this)
     }
 
     componentDidMount() {
@@ -166,15 +171,15 @@ class Scrolling extends React.Component {
             timestamp: Date.now(),
             frame: this.state.offset,
         })
-        this.setState({
-            dragging: false,
-        }) // Resets flag
 
         clearInterval(this.ticker)
         const boundTrack = this.track.bind(this)
         this.ticker = setInterval(boundTrack, 100)
 
         this.trackPosition()
+
+        window.addEventListener('mousemove', this.handleDrag)
+        window.addEventListener('mouseup', this.handleRelease)
 
         e.preventDefault()
         e.stopPropagation()
@@ -194,6 +199,7 @@ class Scrolling extends React.Component {
                     reference: x,
                     dragging: true,
                 })
+
                 this.scroll(this.state.offset + delta)
                 this.viewStyle = {
                     ...this.viewStyle,
@@ -227,6 +233,9 @@ class Scrolling extends React.Component {
             requestAnimationFrame(boundAutoscroll)
         }
 
+        window.removeEventListener('mousemove', this.handleDrag)
+        window.removeEventListener('mouseup', this.handleRelease)
+
         e.preventDefault()
         e.stopPropagation()
         return false
@@ -258,9 +267,14 @@ class Scrolling extends React.Component {
         const boundAutoscroll = this.autoScroll.bind(this)
         requestAnimationFrame(boundAutoscroll)
 
-        e.preventDefault()
-        e.stopPropagation()
-        return false
+        window.removeEventListener('mousemove', this.handleDrag)
+        window.removeEventListener('mouseup', this.handleRelease)
+
+        if (e.currentTarget.getAttribute('id') !== this.refs.view.id) {
+            this.setState({
+                dragging: false,
+            })
+        }
     }
 
     handleWheel(e) {
@@ -299,13 +313,17 @@ class Scrolling extends React.Component {
         }
     }
 
+    handleClick() {
+        this.setState({
+            dragging: false,
+        })
+    }
+
     render() {
         const tapHandler = this.handleTap.bind(this)
-        const dragHandler = this.handleDrag.bind(this)
-        const releaseHandler = this.props.snap ?
-                               this.handleReleaseWithSnap.bind(this) :
-                               this.handleRelease.bind(this)
         const wheelHandler = this.handleWheel.bind(this)
+
+        const clickHandler = this.handleClick.bind(this)
 
         let viewStyle = this.viewStyle || VIEW_STYLE
         if (this.props.horizontal) {
@@ -320,9 +338,10 @@ class Scrolling extends React.Component {
                 <div
                   style={viewStyle}
                   ref="view"
+                  id="js-view"
                   onMouseDown={tapHandler}
-                  onMouseMove={dragHandler}
-                  onMouseUp={releaseHandler}
+                  onMouseUp={this.handleRelease}
+                  onClick={clickHandler}
                   onWheel={wheelHandler}
                 >
                     {this.props.children}
