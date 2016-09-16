@@ -108,6 +108,12 @@ class Scrolling extends React.Component {
             const target = idx * this.props.snap
             const amplitude = target - this.state.offset
 
+            // TODO: Find solution for better enabling animation in this method
+            this.viewStyle = {
+                ...this.viewStyle,
+                transition: 'transform .3s',
+            }
+
             this.setState({
                 target,
                 amplitude,
@@ -115,12 +121,6 @@ class Scrolling extends React.Component {
             })
 
             this.scroll(target)
-
-            // TODO: Find solution for better enabling animation in this method
-            this.viewStyle({
-                ...VIEW_STYLE,
-                transition: 'transform .3s',
-            })
         }
     }
 
