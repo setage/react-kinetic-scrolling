@@ -34,6 +34,7 @@ class Scrolling extends React.Component {
 
     componentDidMount() {
         this.setMaxTransform()
+        this.trackPosition()
     }
 
     setMaxTransform() {
