@@ -1,6 +1,7 @@
 import React from 'react'
 
 const TIME_CONSTANT = 325
+const WHEEL_SPEED = 50
 
 class Scrolling extends React.Component {
     constructor(props) {
@@ -22,11 +23,8 @@ class Scrolling extends React.Component {
 
     setMaxTransform() {
         const measurement = this.props.horizontal ? 'width' : 'height'
-
-        this.setState({
-            max: this.refs.view.getBoundingClientRect()[measurement] -
-                 this.refs.base.getBoundingClientRect()[measurement],
-        })
+        this.state.max = this.refs.view.getBoundingClientRect()[measurement] -
+                         this.refs.base.getBoundingClientRect()[measurement]
     }
 
     pos(e) {
@@ -40,13 +38,8 @@ class Scrolling extends React.Component {
         return e[clientPos]
     }
 
-    scrollToItem(idx) {
-        this.scroll(idx * this.props.snap)
-    }
-
     scroll(x) {
         const { min, max } = this.state
-
         let offset = (x > max) ? max : null
         if (!offset) {
             offset = (x < min) ? min : x
@@ -92,7 +85,26 @@ class Scrolling extends React.Component {
         }
     }
 
-    tap(e) {
+    // Public methods
+
+    scrollToItem(idx) {
+        if (this.props.snap) {
+            this.scroll((idx - 1) * this.props.snap)
+        }
+        return !!this.props.snap
+    }
+
+    atBegin() {
+        return this.state.offset === 0
+    }
+
+    atEnd() {
+        return this.state.offset === this.state.max
+    }
+
+    // Events handlers
+
+    handleTap(e) {
         this.setState({
             pressed: true,
             reference: this.pos(e),
@@ -101,6 +113,7 @@ class Scrolling extends React.Component {
             timestamp: Date.now(),
             frame: this.state.offset,
         })
+        this.dragOccured = false // Resets flag
 
         clearInterval(this.ticker)
         const boundTrack = this.track.bind(this)
@@ -111,7 +124,7 @@ class Scrolling extends React.Component {
         return false
     }
 
-    drag(e) {
+    handleDrag(e) {
         let x
         let delta
 
@@ -124,6 +137,7 @@ class Scrolling extends React.Component {
                     reference: x,
                 })
                 this.scroll(this.state.offset + delta)
+                this.dragOccured = true // Sets flag to detect from parent component if drag occured
             }
         }
 
@@ -132,7 +146,7 @@ class Scrolling extends React.Component {
         return false
     }
 
-    release(e) {
+    handleRelease(e) {
         this.setState({
             pressed: false,
         })
@@ -157,7 +171,7 @@ class Scrolling extends React.Component {
         return false
     }
 
-    releaseSnap(e) {
+    handleReleaseWithSnap(e) {
         this.setState({
             pressed: false,
         })
@@ -188,12 +202,35 @@ class Scrolling extends React.Component {
         return false
     }
 
+    handleWheel(e) {
+        let target = this.state.offset + e.deltaY * WHEEL_SPEED
+
+        if (this.props.snap) {
+            target = Math.round(target / this.props.snap) * this.props.snap
+        }
+        const amplitude = target - this.state.offset
+
+        this.setState({
+            target,
+            amplitude,
+            timestamp: Date.now(),
+        })
+
+        const boundAutoscroll = this.autoScroll.bind(this)
+        requestAnimationFrame(boundAutoscroll)
+
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+    }
+
     render() {
-        const tapHandler = this.tap.bind(this)
-        const moveHandler = this.drag.bind(this)
+        const tapHandler = this.handleTap.bind(this)
+        const dragHandler = this.handleDrag.bind(this)
         const releaseHandler = this.props.snap ?
-                               this.releaseSnap.bind(this) :
-                               this.release.bind(this)
+                               this.handleReleaseWithSnap.bind(this) :
+                               this.handleRelease.bind(this)
+        const wheelHandler = this.handleWheel.bind(this)
 
         const baseStyle = {
             position: 'absolute',
@@ -223,8 +260,9 @@ class Scrolling extends React.Component {
                   style={viewStyle}
                   ref="view"
                   onMouseDown={tapHandler}
-                  onMouseMove={moveHandler}
+                  onMouseMove={dragHandler}
                   onMouseUp={releaseHandler}
+                  onWheel={wheelHandler}
                 >
                     {this.props.children}
                 </div>
