@@ -27,6 +27,7 @@ class Scrolling extends React.Component {
             offset: 0,
             min: 0,
             max: 0,
+            dragging: false,
         }
         this.prev = this.prev.bind(this)
         this.next = this.next.bind(this)
@@ -165,7 +166,9 @@ class Scrolling extends React.Component {
             timestamp: Date.now(),
             frame: this.state.offset,
         })
-        this.dragOccured = false // Resets flag
+        this.setState({
+            dragging: false,
+        }) // Resets flag
 
         clearInterval(this.ticker)
         const boundTrack = this.track.bind(this)
@@ -187,9 +190,9 @@ class Scrolling extends React.Component {
             if (delta > 2 || delta < -2) {
                 this.setState({
                     reference: x,
+                    dragging: true,
                 })
                 this.scroll(this.state.offset + delta)
-                this.dragOccured = true // Sets flag to detect from parent component if drag occured
                 this.viewStyle = {
                     ...this.viewStyle,
                     transition: 'none',
@@ -289,6 +292,7 @@ class Scrolling extends React.Component {
             this.props.trackPosition({
                 atBegin: this.atBegin(),
                 atEnd: this.atEnd(),
+                dragging: this.state.dragging,
             })
         }
     }
