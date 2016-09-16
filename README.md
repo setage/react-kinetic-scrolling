@@ -17,6 +17,7 @@ children | array, string | Accepts simple text or array of elements.
 snap | number | Determines width of grid cell and enables "snap to grid" feature.
 horizontal | bool | Vertical scrolling enabled by default. Set this property to make scrolling horizontally.
 className | string | Adding custom styling for root div of the component
+trackPosition | func | Callback for tracking when Scrolling at edge positions.
 
 ##Methods:
 
@@ -26,5 +27,11 @@ className | string | Adding custom styling for root div of the component
 
 `atEnd()` --- Returns `true` if scrolling at the end (offset = max).
 
+`next()` --- Scrolls to next item if snapping enabled.
 
-Used https://github.com/ariya/kinetic/ for kinetic effect calculations.
+`prev()` --- Scrolls to previous item if snapping enabled.
+
+`current()` --- Returns index of item to which component currently scrolled.
+
+
+*Inspired by and uses https://github.com/ariya/kinetic/ for kinetic effect calculations.*
