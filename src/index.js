@@ -3,15 +3,30 @@ import React from 'react'
 const TIME_CONSTANT = 325
 const WHEEL_SPEED = 50
 
+const BASE_STYLE = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+}
+
+const VIEW_STYLE = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+}
+
 class Scrolling extends React.Component {
     componentWillMount() {
-        this.setState({
+        this.state = {
             pressed: false,
             reference: null,
             offset: 0,
             min: 0,
             max: 0,
-        })
+        }
     }
 
     componentDidMount() {
@@ -47,6 +62,7 @@ class Scrolling extends React.Component {
                                          `translateY(${-offset}px)`
 
         this.setState({ offset })
+        this.trackPosition()
     }
 
     track() {
@@ -71,7 +87,6 @@ class Scrolling extends React.Component {
         if (this.state.amplitude) {
             elapsed = Date.now() - this.state.timestamp
             delta = -this.state.amplitude * Math.exp(-elapsed / TIME_CONSTANT)
-
             if (delta > 5 || delta < -5) {
                 this.scroll(this.state.target + delta)
                 const boundAutoscroll = this.autoScroll.bind(this)
@@ -86,9 +101,45 @@ class Scrolling extends React.Component {
 
     scrollToItem(idx) {
         if (this.props.snap) {
-            this.scroll((idx - 1) * this.props.snap)
+            const target = idx * this.props.snap
+            const amplitude = target - this.state.offset
+
+            this.setState({
+                target,
+                amplitude,
+                timestamp: Date.now(),
+            })
+
+            this.scroll(target)
+
+            // TODO: Find solution for better enabling animation in this method
+            this.viewStyle({
+                ...VIEW_STYLE,
+                transition: 'transform .3s',
+            })
         }
-        return !!this.props.snap
+    }
+
+    prev() {
+        if (this.props.snap) {
+            this.scrollToItem(this.current() - 1)
+        }
+    }
+
+    next() {
+        if (this.props.snap) {
+            this.scrollToItem(this.current() + 1)
+        }
+    }
+
+    current() {
+        let current
+        if (this.state.offset === 0) {
+            current = 0
+        } else {
+            current = Math.round(this.state.offset / this.props.snap)
+        }
+        return current
     }
 
     atBegin() {
@@ -135,6 +186,10 @@ class Scrolling extends React.Component {
                 })
                 this.scroll(this.state.offset + delta)
                 this.dragOccured = true // Sets flag to detect from parent component if drag occured
+                this.viewStyle = {
+                    ...this.viewStyle,
+                    transition: 'none',
+                }
             }
         }
 
@@ -200,6 +255,10 @@ class Scrolling extends React.Component {
     }
 
     handleWheel(e) {
+        this.viewStyle = {
+            ...this.viewStyle,
+            transition: 'none',
+        }
         let target = this.state.offset + e.deltaY * WHEEL_SPEED
 
         if (this.props.snap) {
@@ -221,6 +280,15 @@ class Scrolling extends React.Component {
         return false
     }
 
+    trackPosition() {
+        if (this.props.trackPosition) {
+            this.props.trackPosition({
+                atBegin: this.atBegin(),
+                atEnd: this.atEnd(),
+            })
+        }
+    }
+
     render() {
         const tapHandler = this.handleTap.bind(this)
         const dragHandler = this.handleDrag.bind(this)
@@ -229,21 +297,7 @@ class Scrolling extends React.Component {
                                this.handleRelease.bind(this)
         const wheelHandler = this.handleWheel.bind(this)
 
-        const baseStyle = {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            overflow: 'hidden',
-        }
-
-        let viewStyle = {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-        }
-
+        let viewStyle = this.viewStyle || VIEW_STYLE
         if (this.props.horizontal) {
             viewStyle = {
                 ...viewStyle,
@@ -252,7 +306,7 @@ class Scrolling extends React.Component {
         }
 
         return (
-            <div style={baseStyle} className={this.props.className} ref="base">
+            <div style={BASE_STYLE} className={this.props.className} ref="base">
                 <div
                   style={viewStyle}
                   ref="view"
@@ -276,6 +330,7 @@ Scrolling.propTypes = {
     className: React.PropTypes.string,
     horizontal: React.PropTypes.bool,
     snap: React.PropTypes.number,
+    trackPosition: React.PropTypes.func,
 }
 
 export default Scrolling
