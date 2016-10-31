@@ -36,17 +36,32 @@ class Scrolling extends React.Component {
         this.handleRelease = this.props.snap ?
                              this.handleReleaseWithSnap.bind(this) :
                              this.handleRelease.bind(this)
+        this.handleResize = this.handleResize.bind(this)
     }
 
     componentDidMount() {
-        this.setMaxTransform()
-        this.trackPosition()
+        this.update()
+        window.addEventListener('resize', this.handleResize)
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.handleResize)
     }
 
     setMaxTransform() {
-        const measurement = this.props.horizontal ? 'width' : 'height'
-        this.state.max = this.refs.view.getBoundingClientRect()[measurement] -
-                         this.refs.base.getBoundingClientRect()[measurement]
+        const max = this.props.horizontal ?
+            this.refs.view.offsetWidth - this.refs.base.offsetWidth :
+            this.refs.view.offsetHeight - this.refs.base.offsetHeight
+
+        this.setState({ max })
+    }
+
+    update() {
+        this.setMaxTransform()
+        this.trackPosition()
+
+        const boundAutoscroll = this.autoScroll.bind(this)
+        requestAnimationFrame(boundAutoscroll)
     }
 
     pos(e) {
@@ -159,6 +174,7 @@ class Scrolling extends React.Component {
     atEnd() {
         return this.state.offset === this.state.max
     }
+
 
     // Events handlers
 
@@ -303,6 +319,19 @@ class Scrolling extends React.Component {
         return false
     }
 
+    handleClick() {
+        this.setState({
+            dragging: false,
+        })
+    }
+
+    handleResize() {
+        this.update()
+        this.forceUpdate()
+    }
+
+    // Callback returning Kinetic-scroller state
+
     trackPosition() {
         if (this.props.trackPosition) {
             this.props.trackPosition({
@@ -313,19 +342,13 @@ class Scrolling extends React.Component {
         }
     }
 
-    handleClick() {
-        this.setState({
-            dragging: false,
-        })
-    }
-
     render() {
         const tapHandler = this.handleTap.bind(this)
         const wheelHandler = this.handleWheel.bind(this)
 
         const clickHandler = this.handleClick.bind(this)
 
-        let viewStyle = this.viewStyle || VIEW_STYLE
+        let viewStyle = { ...VIEW_STYLE, ...this.viewStyle }
         if (this.props.horizontal) {
             viewStyle = {
                 ...viewStyle,
