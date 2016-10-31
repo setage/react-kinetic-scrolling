@@ -19,16 +19,18 @@ storiesOf('Scrolling', module)
         </Scrolling>
     ))
     .add('vertical view', () => (
-        <Scrolling>
-            <div className="item item_vertical">1</div>
-            <div className="item item_vertical">2</div>
-            <div className="item item_vertical">3</div>
-            <div className="item item_vertical">4</div>
-            <div className="item item_vertical">5</div>
-            <div className="item item_vertical">6</div>
-            <div className="item item_vertical">7</div>
-            <div className="item item_vertical">8</div>
-            <div className="item item_vertical">9</div>
-            <div className="item item_vertical">10</div>
-        </Scrolling>
+        <div style={{ width: 210, height: '100%', position: 'absolute' }}>
+            <Scrolling>
+                <div className="item item_vertical">1</div>
+                <div className="item item_vertical">2</div>
+                <div className="item item_vertical">3</div>
+                <div className="item item_vertical">4</div>
+                <div className="item item_vertical">5</div>
+                <div className="item item_vertical">6</div>
+                <div className="item item_vertical">7</div>
+                <div className="item item_vertical">8</div>
+                <div className="item item_vertical">9</div>
+                <div className="item item_vertical">10</div>
+            </Scrolling>
+        </div>
     ))
